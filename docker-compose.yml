@@ -1,0 +1,101 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: tounip-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-tounip}
+      POSTGRES_USER: ${POSTGRES_USER:-tounip}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tounip}
+    volumes:
+      - tounip-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tounip} -d ${POSTGRES_DB:-tounip}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    container_name: tounip-redis
+    volumes:
+      - tounip-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: tounip-libretranslate
+    environment:
+      LT_LOAD_ONLY: "ru,en,fr,de,es"
+    volumes:
+      - tounip-libretranslate-data:/home/libretranslate/.local
+    restart: unless-stopped
+
+  livekit:
+    image: livekit/livekit-server:latest
+    container_name: tounip-livekit
+    command: --dev --bind 0.0.0.0
+    environment:
+      LIVEKIT_KEYS: "${LIVEKIT_API_KEY:-devkey}: ${LIVEKIT_API_SECRET:-secret}"
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tounip-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      libretranslate:
+        condition: service_started
+      livekit:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-tounip}
+      DB_USERNAME: ${POSTGRES_USER:-tounip}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-tounip}
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+      JPA_DDL_AUTO: update
+      JPA_SHOW_SQL: false
+
+      JWT_SECRET: ${JWT_SECRET:-tounip-docker-secret-tounip-docker-secret-tounip-docker-secret-2026}
+      JWT_ACCESS_TOKEN_EXPIRATION_MS: 3600000
+      JWT_REFRESH_TOKEN_EXPIRATION_MS: 2592000000
+
+      LIVEKIT_URL: ws://${PUBLIC_HOST:-localhost}:7880
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-devkey}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:-secret}
+
+      TRANSLATION_ENABLED: true
+      TRANSLATION_BASE_URL: http://libretranslate:5000
+      TRANSLATION_API_KEY: ""
+      TRANSLATION_SOURCE_LANGUAGE: auto
+      TRANSLATION_PROVIDER: libretranslate
+
+      SECURITY_LOG_LEVEL: INFO
+      CACHE_TTL: 10m
+    restart: unless-stopped
+
+volumes:
+  tounip-postgres-data:
+  tounip-redis-data:
+  tounip-libretranslate-data:

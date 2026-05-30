@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Access denied | Tounip</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+
+<main class="error-page">
+    <section class="error-card">
+        <div class="error-code">403</div>
+
+        <h1>Access denied</h1>
+
+        <p>
+            You do not have permission to open this page.
+            Please return to your rooms or sign in with another account.
+        </p>
+
+        <div class="error-actions">
+            <a class="btn btn-primary" th:href="@{/spaces}">Back to rooms</a>
+            <a class="btn btn-secondary" th:href="@{/login}">Login</a>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+  servlet:
+    session:
+      timeout: 8h
+      cookie:
+        name: TOUNIPSESSION
+        http-only: true
+        same-site: lax
+
+spring:
+  application:
+    name: tounip
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5435/tounip}
+    username: ${DB_USERNAME:tounip}
+    password: ${DB_PASSWORD:tounip}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    show-sql: ${JPA_SHOW_SQL:true}
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      repositories:
+        enabled: false
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: ${CACHE_TTL:10m}
+  web:
+    error:
+      whitelabel:
+        enabled: false
+
+jwt:
+  secret: ${JWT_SECRET:tounip-dev-secret-tounip-dev-secret-tounip-dev-secret-2026}
+  access-token-expiration-ms: ${JWT_ACCESS_TOKEN_EXPIRATION_MS:3600000}
+  refresh-token-expiration-ms: ${JWT_REFRESH_TOKEN_EXPIRATION_MS:2592000000}
+
+livekit:
+  url: ${LIVEKIT_URL:ws://localhost:7880}
+  api-key: ${LIVEKIT_API_KEY:devkey}
+  api-secret: ${LIVEKIT_API_SECRET:secret}
+
+translation:
+  enabled: ${TRANSLATION_ENABLED:true}
+  base-url: ${TRANSLATION_BASE_URL:http://localhost:5000}
+  api-key: ${TRANSLATION_API_KEY:}
+  source-language: ${TRANSLATION_SOURCE_LANGUAGE:auto}
+  provider: ${TRANSLATION_PROVIDER:libretranslate}
+
+logging:
+  level:
+    org.springframework.security: ${SECURITY_LOG_LEVEL:INFO}

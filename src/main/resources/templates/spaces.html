@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Rooms | Tounip</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="rooms-page">
+    <section class="rooms-hero">
+        <h1>Rooms</h1>
+        <p>Create a room or join a public one.</p>
+    </section>
+
+    <section class="card">
+        <h2>Create room</h2>
+
+        <form method="post"
+              th:action="@{/spaces}"
+              th:object="${createSpaceForm}"
+              class="room-form">
+
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+            <input type="text"
+                   th:field="*{name}"
+                   placeholder="Room name"
+                   required>
+
+            <input type="text"
+                   th:field="*{description}"
+                   placeholder="Short description">
+
+            <label class="checkbox-row">
+                <input type="checkbox" th:field="*{isPublic}">
+                <span>public room</span>
+            </label>
+
+            <button type="submit" class="btn btn-primary">
+                create room
+            </button>
+        </form>
+    </section>
+
+    <section class="rooms-grid">
+        <div class="card">
+            <h2>My rooms</h2>
+
+            <div class="room-list">
+                <a class="room-card"
+                   th:each="space : ${mySpaces}"
+                   th:href="@{/spaces/{id}(id=${space.id})}">
+
+                    <strong th:text="${space.name}">Room name</strong>
+                    <span th:text="${space.description}">Description</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Public rooms</h2>
+
+            <div class="room-list">
+                <div class="room-card" th:each="space : ${publicSpaces}">
+                    <strong th:text="${space.name}">Room name</strong>
+                    <span th:text="${space.description}">Description</span>
+                    <small th:text="'owner: ' + ${space.ownerUsername}">owner</small>
+
+                    <div class="room-actions">
+                        <a class="btn"
+                           th:href="@{/spaces/{id}(id=${space.id})}">
+                            open
+                        </a>
+
+                        <form method="post"
+                              th:action="@{/spaces/{id}/join(id=${space.id})}">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <button type="submit" class="btn">join</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

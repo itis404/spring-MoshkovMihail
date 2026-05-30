@@ -1,0 +1,10 @@
+.git
+.gradle
+out
+.idea
+.env
+*.iml
+
+build/*
+!build/libs/
+!build/libs/**

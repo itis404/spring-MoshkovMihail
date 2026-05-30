@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tounip</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="page">
+    <section class="card start-card">
+        <h1 class="page-title">Tounip</h1>
+        <p class="page-subtitle">
+            Simple rooms for talking, writing messages and translating them.
+        </p>
+
+        <div class="simple-list">
+            <p>1. Create an account.</p>
+            <p>2. Create a room or join a public one.</p>
+            <p>3. Open a channel, write messages and start a call.</p>
+        </div>
+
+        <div class="actions-row">
+            <a class="btn" th:href="@{/register}">create account</a>
+            <a class="btn btn-secondary" th:href="@{/login}">login</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>
